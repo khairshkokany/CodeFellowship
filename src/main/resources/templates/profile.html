@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile information</title>
+</head>
+<body>
+
+<h1>welcome to Your Profile this is your data </h1>
+<tr th:each="ApplicationUser: ${username}">
+    <td th:text="${ApplicationUser.firstName}"></td>
+    <br />
+    <td th:text="${ApplicationUser.lastName}"></td>
+    <br />
+    <td th:text="${ApplicationUser.dateOfBirth}"></td>
+    <br />
+    <td th:text="${ApplicationUser.bio}"></td>
+    <br />
+    <img th:src="${ApplicationUser.imageUrl}" src="image"/>
+    <br />
+
+</tr>
+
+</body>
+</html>
