@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>POSTS</title>
+</head>
+<body>
+<h1>welcome to Your Post Page </h1>
+
+    <p> hello guys my name is :-  <span th:each="ApplicationUser:${username}"
+                                        th:text="${ApplicationUser.getFirstName()}"></span> here i can write anything i want :)
+
+</p>
+
+<form action="/posts" method="post">
+    <div><label> Body : <input type="text" name="body"/> </label></div>
+
+    <div><input type="submit" value="Post"/></div>
+</form>
+
+</body>
+</html>

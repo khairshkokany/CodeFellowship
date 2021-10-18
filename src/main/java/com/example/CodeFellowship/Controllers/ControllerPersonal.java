@@ -2,7 +2,10 @@ package com.example.CodeFellowship.Controllers;
 
 
 import com.example.CodeFellowship.model.ApplicationUser;
+import com.example.CodeFellowship.model.Post;
 import com.example.CodeFellowship.repositery.RepositeryData;
+import com.example.CodeFellowship.repositery.RepositeryPost;
+import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,12 +22,16 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Controller
 public class ControllerPersonal {
 
     @Autowired
     RepositeryData repositeryData;
+
+    @Autowired
+    RepositeryPost repositeryPost;
 
     @Autowired
     BCryptPasswordEncoder encoder;
@@ -39,15 +46,13 @@ public class ControllerPersonal {
     }
     @GetMapping("/profile")
     public String profileInformation(Model model , Principal principal) {
-//        UserDetails userDetails = (UserDetails) SecurityContextHolder
-//                .getContext()
-//                .getAuthentication()
-//                .getPrincipal();
                 ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
                 model.addAttribute("username" , applicationUser);
 
         return "profile";
     }
+
+
 
     @PostMapping("/signup")
     public RedirectView attemptSignUp(
@@ -62,15 +67,34 @@ public class ControllerPersonal {
         applicationUser = repositeryData.save(applicationUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(applicationUser, null, new ArrayList<>());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new RedirectView("/login");
+        return new RedirectView("/profile");
     }
 
 @GetMapping("users/{id}")
 public String getUserById(@PathVariable Long id , Model model){
         model.addAttribute("username" , repositeryData.findApplicationUserById(id));
         return ("profile");
-
 }
+
+
+@GetMapping("/posts")
+    public String getPostForUsername(Model model , Principal principal) {
+    ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
+    model.addAttribute("username" , applicationUser);
+        return "posts";
+}
+
+@PostMapping("/posts")
+    public RedirectView createPostUsername(Model model , Principal principal , String body)
+{
+    ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
+Post post = new Post(applicationUser , body);
+post = repositeryPost.save(post);
+model.addAttribute("username" , applicationUser.getWrittenPost());
+return  new RedirectView("/profile");
+}
+
+
 
 
 
