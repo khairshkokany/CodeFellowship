@@ -7,6 +7,12 @@
 <body>
 
 <h1>welcome to Your Profile this is your data </h1>
+<p> hello guys my name is :-  <span th:each="ApplicationUser:${username}"
+                                    th:text="${ApplicationUser.getFirstName()}"></span> and this is my profile page :0!
+
+</p>
+<a href="posts"> Click Here And Write A Post </a>
+<br />
 <tr th:each="ApplicationUser: ${username}">
     <td th:text="${ApplicationUser.firstName}"></td>
     <br />
@@ -16,10 +22,18 @@
     <br />
     <td th:text="${ApplicationUser.bio}"></td>
     <br />
+
     <img th:src="${ApplicationUser.imageUrl}" src="image"/>
     <br />
 
 </tr>
 
+<tr th:each="Post: ${username.getWrittenPost()}">
+
+<td th:text="${Post.getBody()}"></td>
+<br />
+<td th:text="${Post.getCreatedAt()}"></td>
+<br />
+</tr>
 </body>
 </html>

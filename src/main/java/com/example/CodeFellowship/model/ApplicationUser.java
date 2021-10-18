@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 //An ApplicationUser should have a username,
 //        password (will be hashed using BCrypt), firstName, lastName, dateOfBirth, bio, and any other
@@ -14,6 +15,10 @@ public class ApplicationUser implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+
+@OneToMany (mappedBy = "applicationUser")
+private List<Post> writtenPost;
 
     public Long getId() {
         return id;
@@ -40,6 +45,8 @@ public class ApplicationUser implements UserDetails {
 
     public ApplicationUser() {
     }
+
+
 
     public String getUsername() {
         return username;
@@ -120,5 +127,9 @@ public class ApplicationUser implements UserDetails {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<Post> getWrittenPost() {
+        return writtenPost;
     }
 }
