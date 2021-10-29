@@ -4,8 +4,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 //An ApplicationUser should have a username,
 //        password (will be hashed using BCrypt), firstName, lastName, dateOfBirth, bio, and any other
@@ -19,6 +21,33 @@ public class ApplicationUser implements UserDetails {
 
 @OneToMany (mappedBy = "applicationUser")
 private List<Post> writtenPost;
+
+
+
+    @ManyToMany(fetch = FetchType.EAGER)
+@JoinTable(name = "follower",joinColumns =
+        @JoinColumn(name = "from_id"),
+        inverseJoinColumns = @JoinColumn(name = "to_id"))
+    Set<ApplicationUser> followers;
+    @ManyToMany(mappedBy = "followers")
+    Set<ApplicationUser> following;
+
+
+    public Set<ApplicationUser> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<ApplicationUser> followers) {
+        this.followers = followers;
+    }
+
+    public Set<ApplicationUser> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<ApplicationUser> following) {
+        this.following = following;
+    }
 
     public Long getId() {
         return id;
@@ -80,6 +109,7 @@ private List<Post> writtenPost;
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
+
 
     public String getPassword() {
         return password;
