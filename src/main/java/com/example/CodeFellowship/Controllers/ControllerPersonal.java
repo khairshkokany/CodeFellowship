@@ -9,6 +9,7 @@ import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +24,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @Controller
 public class ControllerPersonal {
@@ -38,65 +41,87 @@ public class ControllerPersonal {
 
     @GetMapping("/signup")
     public String signUpInformation() {
-      return "signup";
+        return "signup";
     }
+
     @GetMapping("/login")
     public String loginInformation() {
         return "login";
     }
+
     @GetMapping("/profile")
-    public String profileInformation(Model model , Principal principal) {
-                ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
-                model.addAttribute("username" , applicationUser);
+    public String profileInformation(Model model, Principal principal) {
+        ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
+        model.addAttribute("username", applicationUser);
 
         return "profile";
     }
 
 
-
     @PostMapping("/signup")
     public RedirectView attemptSignUp(
-                        @RequestParam String username,
-                        @RequestParam String password,
-                        @RequestParam String firstName,
-                        @RequestParam String lastName,
-                        @RequestParam String dateOfBirth,
-                        @RequestParam String bio,
-                        @RequestParam String imageUrl){
-        ApplicationUser applicationUser = new ApplicationUser(username , encoder.encode(password) , firstName , lastName , dateOfBirth , bio , imageUrl);
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String firstName,
+            @RequestParam String lastName,
+            @RequestParam String dateOfBirth,
+            @RequestParam String bio,
+            @RequestParam String imageUrl) {
+        ApplicationUser applicationUser = new ApplicationUser(username, encoder.encode(password), firstName, lastName, dateOfBirth, bio, imageUrl);
         applicationUser = repositeryData.save(applicationUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(applicationUser, null, new ArrayList<>());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return new RedirectView("/profile");
     }
 
-@GetMapping("users/{id}")
-public String getUserById(@PathVariable Long id , Model model){
-        model.addAttribute("username" , repositeryData.findApplicationUserById(id));
+    @GetMapping("users/{id}")
+    public String getUserById(@PathVariable Long id, Model model) {
+        model.addAttribute("username", repositeryData.findApplicationUserById(id));
         return ("profile");
-}
+    }
 
 
-@GetMapping("/posts")
-    public String getPostForUsername(Model model , Principal principal) {
-    ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
-    model.addAttribute("username" , applicationUser);
+    @GetMapping("/posts")
+    public String getPostForUsername(Model model, Principal principal) {
+        ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
+        model.addAttribute("username", applicationUser);
         return "posts";
-}
+    }
 
-@PostMapping("/posts")
-    public RedirectView createPostUsername(Model model , Principal principal , String body)
-{
-    ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
-Post post = new Post(applicationUser , body);
-post = repositeryPost.save(post);
-model.addAttribute("username" , applicationUser.getWrittenPost());
-return  new RedirectView("/profile");
-}
+    @PostMapping("/posts")
+    public RedirectView createPostUsername(Model model, Principal principal, String body) {
+        ApplicationUser applicationUser = repositeryData.findApplicationUserByUsername(principal.getName());
+        Post post = new Post(applicationUser, body);
+        post = repositeryPost.save(post);
+        model.addAttribute("username", applicationUser.getWrittenPost());
+        return new RedirectView("/profile");
+    }
 
+    @PostMapping("/follow")
+    public RedirectView followUser(@AuthenticationPrincipal ApplicationUser user, @RequestParam Long id) {
+        ApplicationUser feed = repositeryData.findApplicationUserByUsername(user.getUsername());
+        ApplicationUser follow = repositeryData.findById(id).get();
+        feed.getFollowers().add(follow);
+        repositeryData.save(feed);
+        return new RedirectView("/feed");
+    }
 
+    @GetMapping("/users")
+    public String getUsers(Model model, Principal principal) {
+        List<ApplicationUser> users = repositeryData.findAll();
+        model.addAttribute("allusers", users);
+        ApplicationUser user = repositeryData.findApplicationUserByUsername(principal.getName());
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("logged", ((UsernamePasswordAuthenticationToken) principal).getPrincipal());
+        model.addAttribute("whoIFollow", user.getFollowers());
+        return "users";
+    }
 
-
-
-
+    @GetMapping("/feed")
+    public String getFeeds(@AuthenticationPrincipal ApplicationUser user, Model model) {
+        ApplicationUser feed = repositeryData.findApplicationUserByUsername(user.getUsername());
+        Set<ApplicationUser> following = feed.getFollowers();
+        model.addAttribute("followers", following);
+        return "feed";
+    }
 }

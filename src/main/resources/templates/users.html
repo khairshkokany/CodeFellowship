@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users Page </title>
+</head>
+<body>
+
+<section>
+
+    <div class="main-div" th:each="user: ${allusers} ">
+        <div style="flex-grow: 1">
+                <img style="width:150px"
+                     th:src="${user.imageUrl}"
+                     alt="defaultImg"/>
+
+        </div>
+
+
+
+
+        <div style="flex-grow: 19; margin-top:32px;" >
+            <h4  style="font-size:22px;" th:text="${user.firstName + ' ' + user.lastName}"></h4>
+            <h5  style="color: darkgreen; margin-top:-8px; font-size:18px" th:text="${user.username}"></h5>
+            <h6 style="margin-top: 15px;" th:text="${user.bio}"></h6>
+
+        </div>
+
+
+        <div style="flex-grow: 1; margin-top: 30px">
+            <form method="POST" action="/follow"  th:if="${whoIFollow.contains(user) != true && userInfo != user.username}">
+
+                <button style="align-items: center"
+                        type="submit"
+                        class="submit"
+                >
+                    Follow
+                </button>
+                <input type="hidden" name="id" th:value="${user.id}" />
+            </form>
+
+<!--            <a th:href="@{user/(id=${user.id})}"> -->
+<!--                <button class="visit-button"type="submit">View</button>-->
+<!--            </a>-->
+
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

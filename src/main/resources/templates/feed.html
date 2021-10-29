@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Feeds</title>
+</head>
+<body>
+
+<p>Hello from Feed Page you can see the posts for your following users </p>
+
+<section>
+    <div
+            class="main-div"
+            th:each="follower:${followers}"
+    >
+        <div >
+                <img
+                        th:src="${follower.imageUrl}"
+                        alt="defaultImg"  style="width: 30%"/>
+
+        </div>
+        <div >
+            <h5 class="card-title" th:text=" ${follower.firstName}"></h5>
+            <h6 th:each="post:${follower.writtenPost}"
+                th:text="${post.body}"></h6>
+            <br/><br/>
+<!--            <form method="post" action="/unfollow">-->
+<!--                <button class="submit" type="submit">Unfollow</button>-->
+<!--                <input type="hidden" name="id" th:value="${follower.id}"/>-->
+<!--            </form>-->
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
